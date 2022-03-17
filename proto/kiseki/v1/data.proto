@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package kiseki.v1;
+
+message Game {
+  string name = 1;
+  repeated Character characters = 2;
+  repeated MasterQuartz master_quartz = 4;
+  repeated Quartz quartz = 5;
+  repeated Art arts = 6;
+}
+
+message Character {
+  string name = 1;
+
+  uint32 hp = 2;
+  uint32 str = 3;
+  uint32 def = 4;
+  uint32 ats = 5;
+  uint32 adf = 6;
+  uint32 dex = 7;
+  uint32 agl = 8;
+  uint32 mov = 9;
+  uint32 spd = 10;
+
+  repeated QuartzLine lines = 11;
+}
+
+message QuartzLine {
+  repeated Slot slots = 1;
+  // index of quartzline to link to
+  optional uint32 linked_with = 2;
+}
+
+message Slot {
+  Element element = 1;
+  Quartz quartz = 2;
+  bool fixed = 3;
+  uint32 level = 4;
+}
+
+enum Element {
+  ELEMENT_UNSPECIFIED = 0;
+  ELEMENT_EARTH = 1;
+  ELEMENT_WATER = 2;
+  ELEMENT_FIRE = 3;
+  ELEMENT_WIND = 4;
+  ELEMENT_TIME = 5;
+  ELEMENT_SPACE = 6;
+  ELEMENT_MIRAGE = 7;
+}
+
+enum Stats {
+  STATS_UNSPECIFIED = 0;
+  STATS_HP = 1;
+  STATS_STR = 2;
+  STATS_DEF = 4;
+  STATS_ATS = 5;
+  STATS_ADF = 6;
+  STATS_DEX = 7;
+  STATS_AGL = 8;
+  STATS_MOV = 9;
+  STATS_SPD = 10;
+
+  // these are not true stats
+  STATS_EVA = 11;
+  STATS_ACC = 12;
+  STATS_EP = 13;
+  STATS_RNG = 14;
+}
+
+message MasterQuartz {
+  string name = 1;
+  Element element = 2;
+  ElementValue value = 3;
+}
+
+message Quartz {
+  string name = 1;
+  Element element = 2;
+  ElementValue value = 3;
+  string category = 4;
+  string effect_str = 5;
+  bool has_hit_effect = 6;
+  uint32 level = 8;
+
+  repeated StatsChange stats_bonus = 7;
+}
+
+message StatsChange {
+  Stats stats = 1;
+  int32 amount = 2;
+  StatsChangeType type = 3;
+}
+
+enum StatsChangeType {
+  STATS_CHANGE_TYPE_UNSPECIFIED = 0;
+  STATS_CHANGE_TYPE_FIXED = 1;
+  STATS_CHANGE_TYPE_PERCENT = 2;
+}
+
+message Art {
+  string name = 1;
+  ElementValue costs = 2;
+}
+
+message ElementValue {
+  uint32 earth = 1;
+  uint32 water = 2;
+  uint32 fire = 3;
+  uint32 wind = 4;
+  uint32 time = 5;
+  uint32 space = 6;
+  uint32 mirage = 7;
+}

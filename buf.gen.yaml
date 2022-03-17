@@ -1,0 +1,9 @@
+version: v1
+plugins:
+  - name: ts
+    out: proto/gen/
+    opt:
+      - generate_dependencies
+      - ts_nocheck
+      - add_pb_suffix
+      - optimize_code_size
