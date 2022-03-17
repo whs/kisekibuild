@@ -16,7 +16,7 @@ Available arts: Stone Spike, Quake, Gorgon Breath, Gaea Titanis, Yggdrasil, Icic
 * Line 2: Solar Gem, EP 3, HP 3, Scent, Lunar Gem
 * Line 3: Attack 3
 
-* Available arts: Stone Spike, Quake, Gorgon Breath, Gaea Titanis, Yggdrasil, Icicle Edge, Blue Drop, Ice Hammer, Hydro Cannon, Diamond Dust, Fire Bolt, Heatwave, Magna Blaze, Sparkle, Aero Sickle, Aerial, Spark Dyne, Thunder Cyclone, Soul Blur, Death Spiral, Dark Matter, Last Disaster, Chaos Brand, Galion Tower, Earth Pulse, Tear, Teara, Tearal, Thelas, Athelas, Breath, Holy Breath, Recuria, Celestial, Innocence Arc, Cobalt Sphere, Lorelei, Chrono Down, Lunar Craze, Crest, La Crest, Adamantine Guard, Aqua Mirage, Forte, La Forte, Sylphid, Chrono Drive, Fortuna, A-Reflex, Saint, Hollow Sphere, Impassion
+Available arts: Stone Spike, Quake, Gorgon Breath, Gaea Titanis, Yggdrasil, Icicle Edge, Blue Drop, Ice Hammer, Hydro Cannon, Diamond Dust, Fire Bolt, Heatwave, Magna Blaze, Sparkle, Aero Sickle, Aerial, Spark Dyne, Thunder Cyclone, Soul Blur, Death Spiral, Dark Matter, Last Disaster, Chaos Brand, Galion Tower, Earth Pulse, Tear, Teara, Tearal, Thelas, Athelas, Breath, Holy Breath, Recuria, Celestial, Innocence Arc, Cobalt Sphere, Lorelei, Chrono Down, Lunar Craze, Crest, La Crest, Adamantine Guard, Aqua Mirage, Forte, La Forte, Sylphid, Chrono Drive, Fortuna, A-Reflex, Saint, Hollow Sphere, Impassion
 
 ### Tio Plato
 * Line 1: HP 3, Solar Gem, Scent, EP 3, Heal, Lunar Gem, Attack 3
