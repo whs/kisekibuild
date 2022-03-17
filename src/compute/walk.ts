@@ -1,6 +1,6 @@
 import {Quartz, QuartzLine} from "../../proto/gen/kiseki/v1/data_pb";
 import * as validators from "./validators";
-import {getFirstFreeSlot, isValid} from "./utils";
+import {getBestFreeSlot, isValid} from "./utils";
 import produce from "immer";
 
 export type Callback = (state: QuartzLine[]) => boolean;
@@ -14,7 +14,7 @@ const validatorsList = [
 ]
 
 export default function walk(state: QuartzLine[], quartz: Quartz[], cb: Callback): Promise<void> {
-	let target = getFirstFreeSlot(state);
+	let target = getBestFreeSlot(state);
 	if(!target){
 		return Promise.resolve();
 	}

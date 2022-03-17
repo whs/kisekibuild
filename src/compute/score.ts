@@ -1,7 +1,7 @@
 import {Art, Element, Quartz, QuartzLine} from "../../proto/gen/kiseki/v1/data_pb";
 import walk from "./walk";
-import {artElement, getArtsList} from "./arts";
-import {countUsedSlots} from "./utils";
+import {artElement, evSatisfyPercentage, getArtsList, getArtsListFromElements} from "./arts";
+import {usedSlots, getElementsValue, hasFreeSlot, quartzActualLines, totalSlots} from "./utils";
 
 export type Scorer = (state: QuartzLine[]) => number;
 
@@ -15,16 +15,13 @@ export async function findBest(scorer: Scorer, state: QuartzLine[], quartz: Quar
 		if (best === null || score > bestScore) {
 			best = state;
 			bestScore = score;
-			bestUsedSlot = countUsedSlots(state);
+			bestUsedSlot = usedSlots(state);
 			return true;
 		}
 
 		// this build use equal slots as best build but is not optimal
 		// don't search further
-		// TODO: This is not actually valid heuristic - it can reach local max since we don't search
-		// at start of each lines separately
-		// I think to fix this getNextFreeSlot should be smarter and pick the 'free-est' slot
-		if(countUsedSlots(state) >= bestUsedSlot && score < bestScore) {
+		if(usedSlots(state) >= bestUsedSlot && score < bestScore) {
 			return false;
 		}
 
@@ -49,6 +46,20 @@ export function weightedScorer(scorers: {scorer: Scorer, weight: number}[]): Sco
 	}
 }
 
+export function scoreByArtCompletionPercentage(arts: Art[]): Scorer {
+	return (state: QuartzLine[]) => {
+		let artCompletion: {[name: string]: number} = {};
+		for (let line of quartzActualLines(state)) {
+			let ev = getElementsValue(line);
+			for (let art of arts) {
+				artCompletion[art.name] = Math.max(artCompletion[art.name]||0, evSatisfyPercentage(art.costs!, ev));
+			}
+		}
+		let sum = Object.values(artCompletion).reduce((a, b) => a+b);
+		return sum / arts.length;
+	}
+}
+
 export function scoreByMostAvailableArts(arts: Art[]): Scorer {
 	return (state: QuartzLine[]) => {
 		return getArtsList(arts, state).size / arts.length;
@@ -56,9 +67,28 @@ export function scoreByMostAvailableArts(arts: Art[]): Scorer {
 }
 
 export function scoreByMostAvailableArtsOfType(arts: Art[], type: Element): Scorer {
-	let totalArtsOfType = arts.filter((art) => artElement(art) === type).length;
+	let artsOfType = arts.filter((art) => artElement(art) === type);
 
 	return (state: QuartzLine[]) => {
-		return Array.from(getArtsList(arts, state)).filter((art) => artElement(art) === type).length / totalArtsOfType;
+		return Array.from(getArtsList(artsOfType, state)).length / artsOfType.length;
 	}
+}
+
+export function scoreByMostElementalValues(state: QuartzLine[]) {
+	let out = 0;
+	for (let line of quartzActualLines(state)) {
+		let ev = getElementsValue(line);
+		out += ev.earth;
+		out += ev.water;
+		out += ev.fire;
+		out += ev.wind;
+		out += ev.time;
+		out += ev.space;
+		out += ev.mirage;
+	}
+	return out / (5*7);
+}
+
+export function scoreByLeastFreeSlot(state: QuartzLine[]) {
+	return usedSlots(state)/totalSlots(state);
 }

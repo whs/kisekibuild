@@ -1,4 +1,4 @@
-import {ElementValue, Quartz, QuartzLine, Slot} from "../../proto/gen/kiseki/v1/data_pb";
+import {Element, ElementValue, QuartzLine, Slot} from "../../proto/gen/kiseki/v1/data_pb";
 import {Validator} from "./validators";
 
 /**
@@ -31,17 +31,39 @@ export function useLinkedWith(state: QuartzLine[]): boolean {
 	return false;
 }
 
-export function getFirstFreeSlot(state: QuartzLine[]): [number, number]|null {
+interface ChoiceInfo {
+	lineId: number;
+	slotId: number;
+	score: number;
+}
+
+export function getBestFreeSlot(state: QuartzLine[]): [number, number]|null {
+	let choices: ChoiceInfo[] = [];
 	for (let lineId = 0; lineId < state.length; lineId++) {
 		const line = state[lineId];
 		for (let slotId = 0; slotId < line.slots.length; slotId++){
 			const slot = line.slots[slotId];
 			if (!slot.quartz) {
-				return [lineId, slotId]
+				let peerSlots = line.slots.length - 1;
+				// 1. choose element-locked slots first
+				// 2. choose linked lines last
+				// 3. choose largest lines first
+				// 4. choose highest slots first
+				let score = (slot.element !== Element.UNSPECIFIED ? 100 : 0)
+					+ (line.linkedWith === undefined ? 20 : 0)
+					+ (totalSlots(state)-slotId)
+					+ peerSlots;
+				choices.push({lineId, slotId, score});
 			}
 		}
 	}
-	return null;
+	if (choices.length === 0) {
+		return null;
+	}
+
+	choices.sort((a, b) => a.score - b.score);
+	let lastChoice = choices[choices.length - 1];
+	return [lastChoice.lineId, lastChoice.slotId];
 }
 
 export function isValid(state: QuartzLine[], validators: Validator[]): boolean {
@@ -86,7 +108,17 @@ export function linesToString(state: QuartzLine[]): string {
 	return out.join('\n');
 }
 
-export function countUsedSlots(state: QuartzLine[]): number{
+export function totalSlots(state: QuartzLine[]): number{
+	let out = 0;
+	for (let line of state) {
+		for (let slot of line.slots) {
+			out++;
+		}
+	}
+	return out;
+}
+
+export function usedSlots(state: QuartzLine[]): number{
 	let out = 0;
 	for (let line of state) {
 		for (let slot of line.slots) {
@@ -96,4 +128,15 @@ export function countUsedSlots(state: QuartzLine[]): number{
 		}
 	}
 	return out;
+}
+
+export function hasFreeSlot(state: QuartzLine[]): boolean {
+	for (let line of state) {
+		for (let slot of line.slots) {
+			if (!slot.quartz){
+				return true;
+			}
+		}
+	}
+	return false;
 }

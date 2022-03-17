@@ -1,16 +1,34 @@
 import {Art, Element, ElementValue, QuartzLine} from "../../proto/gen/kiseki/v1/data_pb";
 import {getElementsValue, quartzActualLines} from "./utils";
 
+export function isEvSatisfyReq(req: ElementValue, ev: ElementValue): boolean {
+	return ev.earth >= req.earth &&
+		ev.water >= req.water &&
+		ev.fire >= req.fire &&
+		ev.wind >= req.wind &&
+		ev.time >= req.time &&
+		ev.space >= req.space &&
+		ev.mirage >= req.mirage;
+}
+
+export function evSatisfyPercentage(req: ElementValue, ev: ElementValue): number {
+	let values = [
+		ev.earth/req.earth,
+		ev.water/req.water,
+		ev.fire/req.fire,
+		ev.wind/req.wind,
+		ev.time/req.time,
+		ev.space/req.space,
+		ev.mirage/req.mirage,
+	].map((i) => Math.min(i, 1)).filter((i) => Number.isFinite(i));
+
+	let sum = values.reduce((a, b) => a+b);
+
+	return sum / values.length;
+}
+
 export function getArtsListFromElements(arts: Art[], ev: ElementValue): Art[] {
-	return arts.filter((art) => {
-		return art.costs!.earth <= ev.space &&
-			art.costs!.water <= ev.water &&
-			art.costs!.fire <= ev.fire &&
-			art.costs!.wind <= ev.wind &&
-			art.costs!.time <= ev.time &&
-			art.costs!.space <= ev.space &&
-			art.costs!.mirage <= ev.mirage;
-	});
+	return arts.filter((art) => isEvSatisfyReq(art.costs!, ev));
 }
 
 export function getArtsList(arts: Art[], state: QuartzLine[]): Set<Art> {
