@@ -1,6 +1,6 @@
-import {Game} from "../../proto/gen/kiseki/v1/data_pb";
+import {Element, Game} from "../../proto/gen/kiseki/v1/data_pb";
 import {readFileSync} from "fs";
-import {findBest, scoreByMostAvailableArts} from "./score";
+import {findBest, scoreByMostAvailableArts, scoreByMostAvailableArtsOfType, weightedScorer} from "./score";
 import {setAutoFreeze} from "immer";
 import {linesToString} from "./utils";
 import {getArtsList} from "./arts";
@@ -15,7 +15,11 @@ let game = Game.fromBinary(data);
 	for (let character of game.characters) {
 		console.log(character.name);
 
-		let best = await findBest(scoreByMostAvailableArts(game.arts), character.lines, game.quartz)
+		// let best = await findBest(scoreByMostAvailableArts(game.arts), character.lines, game.quartz)
+		let best = await findBest(weightedScorer([
+			{scorer: scoreByMostAvailableArts(game.arts), weight: 5},
+			{scorer: scoreByMostAvailableArtsOfType(game.arts, Element.SPACE), weight: 1},
+		]), character.lines, game.quartz);
 
 		console.log(`Score: ${best.score}`);
 		console.log(linesToString(best.state));
