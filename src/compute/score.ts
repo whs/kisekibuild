@@ -1,7 +1,15 @@
 import {Art, Character, Element, Quartz, QuartzLine, Stats} from "../../proto/gen/kiseki/v1/data_pb";
 import walk from "./walk";
 import {artElement, evSatisfyPercentage, getArtsList, getArtsListFromElements} from "./arts";
-import {usedSlots, getElementsValue, hasFreeSlot, quartzActualLines, totalSlots, getStats} from "./utils";
+import {
+	usedSlots,
+	getElementsValue,
+	hasFreeSlot,
+	quartzActualLines,
+	totalSlots,
+	getStats,
+	getCharacterStats
+} from "./utils";
 
 export type Scorer = (state: readonly QuartzLine[]) => number;
 
@@ -97,6 +105,6 @@ export function scoreByLeastFreeSlot(state: readonly QuartzLine[]) {
 
 export function scoreByMostStats(character: Character, stats: Stats): Scorer {
 	return (state) => {
-		return getStats(character, state, stats)/1000;
+		return getStats(character, state, stats)/(getCharacterStats(character, stats)*2);
 	}
 }

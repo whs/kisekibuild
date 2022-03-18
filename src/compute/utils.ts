@@ -8,6 +8,7 @@ import {
 	StatsChangeType
 } from "../../proto/gen/kiseki/v1/data_pb";
 import {Validator} from "./validators";
+import {Scorer} from "./score";
 
 /**
  * Return list of quartz lines without linking
@@ -51,6 +52,9 @@ export function getBestFreeSlot(state: readonly QuartzLine[]): [number, number]|
 		const line = state[lineId];
 		for (let slotId = 0; slotId < line.slots.length; slotId++){
 			const slot = line.slots[slotId];
+			if (slot.level === 0) {
+				continue;
+			}
 			if (!slot.quartz) {
 				let peerSlots = line.slots.length - 1;
 				// 1. choose element-locked slots first
@@ -149,8 +153,12 @@ export function hasFreeSlot(state: readonly QuartzLine[]): boolean {
 	return false;
 }
 
+export function getCharacterStats(character: Character, stats: Stats): number {
+	return (character as any)[Stats[stats].toLowerCase()] as number;
+}
+
 export function getStats(character: Character, state: readonly QuartzLine[], stats: Stats): number {
-	let baseValue = (character as any)[Stats[stats].toLowerCase()] as number || 1;
+	let baseValue = getCharacterStats(character, stats) || 1;
 	let percentageBonus = 0;
 
 	for (let line of state) {
@@ -179,4 +187,11 @@ export function getStats(character: Character, state: readonly QuartzLine[], sta
 	}
 
 	return baseValue + baseValue * percentageBonus/100;
+}
+
+export function autoWeight(scorers: Scorer[]): {scorer: Scorer, weight: number}[] {
+	return scorers.map((scorer, index) => ({
+		scorer,
+		weight: 2 << scorers.length - index,
+	}))
 }

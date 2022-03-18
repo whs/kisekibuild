@@ -1,4 +1,4 @@
-import {Element, Game, Stats} from "../../proto/gen/kiseki/v1/data_pb";
+import {Game, Stats} from "../../proto/gen/kiseki/v1/data_pb";
 import {readFileSync} from "fs";
 import {
 	findBest, scoreByArtCompletionPercentage, scoreByLeastFreeSlot,
@@ -7,7 +7,7 @@ import {
 	weightedScorer
 } from "./score";
 import {setAutoFreeze} from "immer";
-import {linesToString} from "./utils";
+import {autoWeight, getStats, linesToString} from "./utils";
 import {getArtsList} from "./arts";
 
 setAutoFreeze(false);
@@ -20,18 +20,20 @@ let game = Game.fromBinary(data);
 	for (let character of game.characters) {
 		console.log(character.name);
 
-		let best = await findBest(weightedScorer([
-			{scorer: scoreByLeastFreeSlot, weight: 1},
-			{scorer: scoreByMostStats(character, Stats.STR), weight: 10},
-			{scorer: scoreByMostAvailableArts(game.arts), weight: 4},
-			{scorer: scoreByArtCompletionPercentage(game.arts), weight: 1},
-			{scorer: scoreByMostElementalValues, weight: 0.5},
-		]), character.lines, game.quartz);
+		let best = await findBest(weightedScorer(autoWeight([
+			scoreByLeastFreeSlot,
+			// scoreByMostAvailableArts(game.arts),
+			scoreByMostStats(character, Stats.STR),
+			scoreByMostStats(character, Stats.ATS),
+			// scoreByArtCompletionPercentage(game.arts),
+			scoreByMostElementalValues,
+		])), character.lines, game.quartz);
 
 		console.log(`Score: ${best.score}`);
 		console.log(linesToString(best.state));
 		let availableArts = Array.from(getArtsList(game.arts, best.state));
 		console.log(`Available arts (${availableArts.length}): ` + availableArts.map((item) => item.name).join(', '));
+		console.log(`STR: ${getStats(character, best.state, Stats.STR)}`);
 		console.log('==============');
 	}
 })()

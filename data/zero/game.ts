@@ -73,15 +73,15 @@ export const characters = [
 	}),
 	Character.create({
 		name: 'Tio Plato',
-		// hp: Math.floor(15*16),
-		// str: Math.floor(0.045*15*16+18),
-		// def: Math.floor(0.045*15*16+8),
-		// ats: Math.floor(0.06*15*16+21),
-		// adf: Math.floor(0.06*15*16+10),
-		// dex: Math.floor(0.0025*15*16+21),
-		// agl: Math.floor(0.0025*15*16+10),
-		// mov: 3,
-		// spd: Math.floor(0.0025*15*16+29),
+		hp: Math.floor(0.85*15*16),
+		str: Math.floor(0.005*15*16+25),
+		def: Math.floor(0.0475*15*16+9),
+		ats: Math.floor(0.0575*15*16+20),
+		adf: Math.floor(0.0575*15*16+10),
+		dex: Math.floor(0.0025*15*16+20),
+		agl: Math.floor(0.0025*15*16+7),
+		mov: 3,
+		spd: Math.floor(0.0025*15*16+28),
 		lines: [
 			{
 				slots: [
@@ -98,15 +98,15 @@ export const characters = [
 	}),
 	Character.create({
 		name: 'Randy Orlando',
-		// hp: Math.floor(15*16),
-		// str: Math.floor(0.045*15*16+18),
-		// def: Math.floor(0.045*15*16+8),
-		// ats: Math.floor(0.06*15*16+21),
-		// adf: Math.floor(0.06*15*16+10),
-		// dex: Math.floor(0.0025*15*16+21),
-		// agl: Math.floor(0.0025*15*16+10),
-		// mov: 3,
-		// spd: Math.floor(0.0025*15*16+29),
+		hp: Math.floor(1.25*15*16),
+		str: Math.floor(0.055*15*16+21),
+		def: Math.floor(0.055*15*16+11),
+		ats: Math.floor(0.0475*15*16+19),
+		adf: Math.floor(0.04*15*16+10),
+		dex: Math.floor(0.0025*15*16+18),
+		agl: Math.floor(0.0025*15*16+9),
+		mov: 5,
+		spd: Math.floor(0.0025*15*16*27),
 		lines: [
 			{
 				slots: [
