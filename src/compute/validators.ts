@@ -1,9 +1,9 @@
 import {Element, QuartzLine} from "../../proto/gen/kiseki/v1/data_pb";
 import {quartzActualLines} from "./utils";
 
-export type Validator = (state: QuartzLine[]) => boolean;
+export type Validator = (state: readonly QuartzLine[]) => boolean;
 
-export function noLevel0SlotUsed(state: QuartzLine[]): boolean {
+export function noLevel0SlotUsed(state: readonly QuartzLine[]): boolean {
 	for (let line of state) {
 		for (let slot of line.slots) {
 			if (slot.level === 0 && !!slot.quartz) {
@@ -14,7 +14,7 @@ export function noLevel0SlotUsed(state: QuartzLine[]): boolean {
 	return true;
 }
 
-export function quartzMustMatchSlot(state: QuartzLine[]): boolean {
+export function quartzMustMatchSlot(state: readonly QuartzLine[]): boolean {
 	for (let line of state) {
 		for (let slot of line.slots) {
 			if (slot.element === Element.UNSPECIFIED) {
@@ -32,7 +32,7 @@ export function quartzMustMatchSlot(state: QuartzLine[]): boolean {
 	return true;
 }
 
-export function noDuplicateQuartz(state: QuartzLine[]): boolean {
+export function noDuplicateQuartz(state: readonly QuartzLine[]): boolean {
 	let found = new Set();
 	for (let line of state) {
 		for (let slot of line.slots) {
@@ -48,10 +48,10 @@ export function noDuplicateQuartz(state: QuartzLine[]): boolean {
 	return true;
 }
 
-export function noQuartzInSameCategoryInLine(state: QuartzLine[]): boolean {
-	for (let line of quartzActualLines(state)) {
-		let found = new Set();
-		for (let slot of line) {
+export function noQuartzInSameCategory(state: readonly QuartzLine[]): boolean {
+	let found = new Set();
+	for (let line of state) {
+		for (let slot of line.slots) {
 			if (!slot.quartz?.category) {
 				continue;
 			}
@@ -65,7 +65,7 @@ export function noQuartzInSameCategoryInLine(state: QuartzLine[]): boolean {
 	return true;
 }
 
-export function noMultipleHitEffectsInLine(state: QuartzLine[]): boolean {
+export function noMultipleHitEffectsInLine(state: readonly QuartzLine[]): boolean {
 	for (let line of quartzActualLines(state)) {
 		let hasEffect = false;
 		for (let slot of line) {

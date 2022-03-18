@@ -9,11 +9,11 @@ const validatorsList = [
 	validators.noLevel0SlotUsed,
 	validators.quartzMustMatchSlot,
 	validators.noDuplicateQuartz,
-	validators.noQuartzInSameCategoryInLine,
+	validators.noQuartzInSameCategory,
 	validators.noMultipleHitEffectsInLine,
 ]
 
-export default function walk(state: QuartzLine[], quartz: Quartz[], cb: Callback): Promise<void> {
+export default function walk(state: readonly QuartzLine[], quartz: readonly Quartz[], cb: Callback): Promise<void> {
 	let target = getBestFreeSlot(state);
 	if(!target){
 		return Promise.resolve();
@@ -26,7 +26,7 @@ export default function walk(state: QuartzLine[], quartz: Quartz[], cb: Callback
 	for (let q of quartz) {
 		let newState = produce(state, (draft) => {
 			draft[lineId].slots[slotId].quartz = q;
-		});
+		}) as QuartzLine[];
 		if(!isValid(newState, validatorsList)) {
 			continue;
 		}

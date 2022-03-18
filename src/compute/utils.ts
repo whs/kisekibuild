@@ -1,10 +1,18 @@
-import {Element, ElementValue, QuartzLine, Slot} from "../../proto/gen/kiseki/v1/data_pb";
+import {
+	Character,
+	Element,
+	ElementValue,
+	QuartzLine,
+	Slot,
+	Stats,
+	StatsChangeType
+} from "../../proto/gen/kiseki/v1/data_pb";
 import {Validator} from "./validators";
 
 /**
  * Return list of quartz lines without linking
  */
-export function quartzActualLines(state: QuartzLine[]): Slot[][] {
+export function quartzActualLines(state: readonly QuartzLine[]): Slot[][] {
 	if (!useLinkedWith(state)) {
 		// if linked feature is not used then the input is already valid
 		return state.map((item) => item.slots);
@@ -22,7 +30,7 @@ export function quartzActualLines(state: QuartzLine[]): Slot[][] {
 	return out;
 }
 
-export function useLinkedWith(state: QuartzLine[]): boolean {
+export function useLinkedWith(state: readonly QuartzLine[]): boolean {
 	for(let line of state){
 		if(line.linkedWith !== undefined) {
 			return true;
@@ -37,7 +45,7 @@ interface ChoiceInfo {
 	score: number;
 }
 
-export function getBestFreeSlot(state: QuartzLine[]): [number, number]|null {
+export function getBestFreeSlot(state: readonly QuartzLine[]): [number, number]|null {
 	let choices: ChoiceInfo[] = [];
 	for (let lineId = 0; lineId < state.length; lineId++) {
 		const line = state[lineId];
@@ -66,7 +74,7 @@ export function getBestFreeSlot(state: QuartzLine[]): [number, number]|null {
 	return [lastChoice.lineId, lastChoice.slotId];
 }
 
-export function isValid(state: QuartzLine[], validators: Validator[]): boolean {
+export function isValid(state: readonly QuartzLine[], validators: Validator[]): boolean {
 	for (let v of validators) {
 		if (!v(state)) {
 			return false;
@@ -75,7 +83,7 @@ export function isValid(state: QuartzLine[], validators: Validator[]): boolean {
 	return true;
 }
 
-export function getElementsValue(slots: Slot[]): ElementValue {
+export function getElementsValue(slots: readonly Slot[]): ElementValue {
 	let out = ElementValue.create();
 	for (let slot of slots) {
 		if(!slot.quartz){
@@ -93,7 +101,7 @@ export function getElementsValue(slots: Slot[]): ElementValue {
 	return out;
 }
 
-export function linesToString(state: QuartzLine[]): string {
+export function linesToString(state: readonly QuartzLine[]): string {
 	let out = [];
 	for (let lineId = 0; lineId < state.length; lineId++) {
 		let line = state[lineId];
@@ -108,7 +116,7 @@ export function linesToString(state: QuartzLine[]): string {
 	return out.join('\n');
 }
 
-export function totalSlots(state: QuartzLine[]): number{
+export function totalSlots(state: readonly QuartzLine[]): number{
 	let out = 0;
 	for (let line of state) {
 		for (let slot of line.slots) {
@@ -118,7 +126,7 @@ export function totalSlots(state: QuartzLine[]): number{
 	return out;
 }
 
-export function usedSlots(state: QuartzLine[]): number{
+export function usedSlots(state: readonly QuartzLine[]): number{
 	let out = 0;
 	for (let line of state) {
 		for (let slot of line.slots) {
@@ -130,7 +138,7 @@ export function usedSlots(state: QuartzLine[]): number{
 	return out;
 }
 
-export function hasFreeSlot(state: QuartzLine[]): boolean {
+export function hasFreeSlot(state: readonly QuartzLine[]): boolean {
 	for (let line of state) {
 		for (let slot of line.slots) {
 			if (!slot.quartz){
@@ -139,4 +147,36 @@ export function hasFreeSlot(state: QuartzLine[]): boolean {
 		}
 	}
 	return false;
+}
+
+export function getStats(character: Character, state: readonly QuartzLine[], stats: Stats): number {
+	let baseValue = (character as any)[Stats[stats].toLowerCase()] as number || 1;
+	let percentageBonus = 0;
+
+	for (let line of state) {
+		for (let slot of line.slots) {
+			if (!slot.quartz) {
+				continue
+			}
+			for (let statsBonus of slot.quartz.statsBonus){
+				if (statsBonus.stats !== stats) {
+					continue
+				}
+				switch(statsBonus.type){
+				case StatsChangeType.PERCENT:
+					percentageBonus += statsBonus.amount;
+					break;
+				case StatsChangeType.FIXED: default:
+					baseValue += statsBonus.amount;
+					break;
+				}
+			}
+		}
+	}
+
+	if (stats === Stats.EVA || stats === Stats.ACC) {
+		return percentageBonus;
+	}
+
+	return baseValue + baseValue * percentageBonus/100;
 }

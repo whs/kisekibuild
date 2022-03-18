@@ -27,11 +27,11 @@ export function evSatisfyPercentage(req: ElementValue, ev: ElementValue): number
 	return sum / values.length;
 }
 
-export function getArtsListFromElements(arts: Art[], ev: ElementValue): Art[] {
+export function getArtsListFromElements(arts: readonly Art[], ev: ElementValue): Art[] {
 	return arts.filter((art) => isEvSatisfyReq(art.costs!, ev));
 }
 
-export function getArtsList(arts: Art[], state: QuartzLine[]): Set<Art> {
+export function getArtsList(arts: readonly Art[], state: readonly QuartzLine[]): Set<Art> {
 	let out = new Set<Art>();
 
 	for (let line of quartzActualLines(state)) {
